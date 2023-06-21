@@ -1,0 +1,3 @@
+The R2OpenBUGS code serves as a clinical trial design example
+to obtain the posterior distribution for power in the design of
+a two-arm cluster randomized trial using the symbolic two-step method.

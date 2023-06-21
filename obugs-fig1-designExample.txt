@@ -1,0 +1,48 @@
+model {
+
+      ### simulate gam0, gam1, sigmasq, and sigmasq.u from their prior distributions
+      ### we express uncertainty in these parameters using the variance of the parameters
+      ### subset them in the power formula
+      ### obtain a predictive distribution for power
+      
+
+      # intercept
+      var.gam0 <- ( sigmasq * sum.xsq ) / ( n * sum.xminusxbarsq )
+      prec.gam0 <- 1 /  var.gam0
+      gam0.hat ~ dnorm( gam0, prec.gam0 )
+      gam0 ~ dnorm( 0, 0.001 )
+
+
+      # slope
+      var.gam1 <- sigmasq / sum.xminusxbarsq
+      prec.gam1 <- 1 / var.gam1
+      gam1.hat ~ dnorm( gam1, prec.gam1 )
+      gam1 ~ dnorm( 0, 0.001 )
+
+
+      # variance
+      alpha1 <- df / 2
+      beta1 <- ( df * tausq ) / 2
+      sigmasq.hat ~ dgamma( alpha1, beta1 ) 
+      sigmasq <- pow( sigma, 2 )
+      tausq <- 1 / sigmasq
+      sigma ~ dunif( 0, 10 )
+
+
+      # between variance
+      alpha2 <- df / 2
+      beta2 <- ( df * tausq.u ) / 2
+      sigmasq.u.hat ~ dgamma( alpha2, beta2 ) 
+      sigmasq.u <- pow( sigma.u, 2 )
+      tausq.u <- 1 / sigmasq.u
+      sigma.u ~ dunif( 0, 10 )
+
+
+      ### within variance
+      within <- ( 1 - p ) * exp( gam0 + sigmasq / 2 ) + p * exp( gam0 + gam1 + sigmasq / 2 )
+      
+      
+      ### power
+      power <- phi( pow(delta, 1) / ( sqrt( ( 2 / c2 ) * (within / m2 + sigmasq.u) ) ) - 1.959964 )
+      
+}
